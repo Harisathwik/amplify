@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root[data-theme="dark"] {
+      --bg: #1a1a1a; --bg2: #222; --bg3: #333;
+      --fg: #e0e0e0; --fg2: #aaa; --fg3: #666; --fg4: #555;
+      --accent: #4488cc; --warn: #cc9900; --danger: #cc3333;
+      --ok: #66aa66; --border: #333; --border2: #555;
+    }
+    :root[data-theme="light"] {
+      --bg: #f5f5f5; --bg2: #eee; --bg3: #ddd;
+      --fg: #222; --fg2: #555; --fg3: #999; --fg4: #bbb;
+      --accent: #2266aa; --warn: #aa7700; --danger: #bb2222;
+      --ok: #338833; --border: #ccc; --border2: #aaa;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 300px;
+      padding: 14px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .title-area { display: flex; align-items: center; gap: 8px; }
+
+    .title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .theme-btn {
+      width: 22px; height: 22px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--fg3);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .theme-btn:hover { border-color: var(--border2); color: var(--fg); }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--fg2);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+    .icon-btn:hover { border-color: var(--border2); color: var(--fg); }
+    .icon-btn.muted { border-color: var(--danger); color: var(--danger); background: #2a1111; }
+
+    .value {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--fg);
+      transition: color 0.2s, transform 0.1s;
+    }
+    .value.muted { color: var(--danger); }
+    .value.level-low { color: var(--fg3); }
+    .value.level-normal { color: var(--fg); }
+    .value.level-high { color: var(--warn); }
+    .value.level-danger { color: var(--danger); }
+    .value.flash { transform: scale(1.1); }
+
+    .slider-container { position: relative; margin-bottom: 10px; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg3);
+      outline: none;
+      transition: opacity 0.15s;
+    }
+    input[type="range"].disabled { opacity: 0.3; pointer-events: none; }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--fg);
+      cursor: pointer;
+      border: 2px solid var(--border2);
+      margin-top: -5px;
+    }
+
+    .ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--fg3);
+      margin-top: 3px;
+      padding: 0 2px;
+    }
+
+    .btn-row { display: flex; gap: 5px; margin-top: 8px; }
+
+    .btn {
+      flex: 1;
+      padding: 5px 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--fg2);
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .btn:hover { border-color: var(--border2); color: var(--fg); }
+    .btn.active { border-color: var(--fg); color: var(--fg); background: var(--bg3); }
+
+    .section-label {
+      font-size: 9px;
+      color: var(--fg3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 12px;
+      margin-bottom: 5px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .toggle-label { font-size: 11px; color: var(--fg2); }
+
+    .toggle-switch {
+      position: relative;
+      width: 32px; height: 18px;
+      background: var(--bg3);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-switch.on { background: var(--accent); }
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 14px; height: 14px;
+      background: var(--fg);
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle-switch.on::after { transform: translateX(14px); }
+
+    .site-row { display: flex; gap: 5px; margin-top: 8px; }
+
+    .site-btn {
+      flex: 1;
+      padding: 5px 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--fg2);
+      font-size: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .site-btn:hover { border-color: var(--border2); color: var(--fg); }
+    .site-btn.saved { border-color: var(--ok); color: var(--ok); }
+
+    .site-info {
+      font-size: 9px;
+      color: var(--fg4);
+      margin-top: 3px;
+      text-align: center;
+    }
+
+    .visualizer {
+      margin-top: 10px;
+      height: 32px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+
+    .visualizer canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .tab-list {
+      margin-top: 10px;
+      max-height: 90px;
+      overflow-y: auto;
+    }
+
+    .tab-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.1s;
+      font-size: 10px;
+      color: var(--fg2);
+    }
+    .tab-item:hover { background: var(--bg2); }
+    .tab-item.current { background: var(--bg3); color: var(--fg); }
+
+    .tab-icon {
+      width: 14px; height: 14px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .tab-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tab-vol {
+      font-size: 9px;
+      color: var(--fg3);
+      flex-shrink: 0;
+    }
+
+    .reset {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--fg3);
+      font-size: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .reset:hover { border-color: var(--border2); color: var(--fg2); }
+
+    .warn {
+      margin-top: 8px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      display: none;
+    }
+    .warn.level-high { background: #2a1f00; border: 1px solid #554400; color: var(--warn); }
+    .warn.level-danger { background: #2a1111; border: 1px solid #553333; color: var(--danger); }
+
+    .footer {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--bg2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .shortcuts {
+      font-size: 8px;
+      color: var(--fg4);
+      line-height: 1.5;
+    }
+
+    .shortcuts kbd {
+      padding: 1px 3px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: inherit;
+      font-size: 8px;
+      color: var(--fg3);
+    }
+
+    .kofi-link {
+      font-size: 9px;
+      color: var(--fg3);
+      text-decoration: none;
+      padding: 3px 6px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      transition: all 0.15s;
+    }
+    .kofi-link:hover { border-color: #ff5e5b; color: #ff5e5b; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title-area">
+      <span class="title">AMPLIFY</span>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">&#9681;</button>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="muteBtn" title="Mute / unmute">&#x1f50a;</button>
+      <span class="value" id="display">100%</span>
+    </div>
+  </div>
+
+  <div class="slider-container" id="sliderArea">
+    <input type="range" id="slider" min="0" max="600" value="100" step="5">
+    <div class="ticks">
+      <span>0</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span><span>600</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" data-val="100">100%</button>
+    <button class="btn" data-val="200">200%</button>
+    <button class="btn" data-val="400">400%</button>
+    <button class="btn" data-val="600">600%</button>
+  </div>
+
+  <div class="section-label">Equalizer</div>
+  <div class="btn-row">
+    <button class="btn eq-btn active" data-eq="default">Default</button>
+    <button class="btn eq-btn" data-eq="voice">Voice</button>
+    <button class="btn eq-btn" data-eq="bass">Bass</button>
+    <button class="btn eq-btn" data-eq="night">Night</button>
+  </div>
+
+  <div class="toggle-row">
+    <span class="toggle-label">Auto-normalize</span>
+    <div class="toggle-switch" id="normalizeToggle"></div>
+  </div>
+
+  <div class="section-label">Site Profile</div>
+  <div class="site-row">
+    <button class="site-btn" id="saveSite">Save for this site</button>
+    <button class="site-btn" id="clearSite">Clear</button>
+  </div>
+  <div class="site-info" id="siteInfo"></div>
+
+  <div class="visualizer" id="vizContainer">
+    <canvas id="vizCanvas"></canvas>
+  </div>
+
+  <div id="tabListLabel" style="display:none"></div>
+  <div class="tab-list" id="tabList"></div>
+
+  <button class="reset" id="reset">Reset to 100%</button>
+
+  <div class="warn" id="warn"></div>
+
+  <div class="footer">
+    <div class="shortcuts">
+      <kbd>Alt+Shift+Up/Down</kbd> vol<br>
+      <kbd>Alt+Shift+M</kbd> mute
+      <kbd>Scroll</kbd> slider<br>
+      Audio broke? Reload the page.
+    </div>
+    <a class="kofi-link" href="https://ko-fi.com/rednodestudio" target="_blank">&#9829; Ko-fi</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
