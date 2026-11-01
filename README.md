@@ -23,7 +23,7 @@ Unlike other volume extensions that use `tabCapture` (which breaks fullscreen on
 
 **Chrome Web Store:** [Install Amplify](https://chromewebstore.google.com/detail/amplify/ffcfjalcdppichdnmdoaboeenalcdbeb)
 
-**Firefox Add-ons:** (under review)
+**Firefox Add-ons:** [Install Amplify Audio](https://addons.mozilla.org/en-US/firefox/addon/amplify-audio/)
 
 **Manual install:**
 1. Download or clone this repo
