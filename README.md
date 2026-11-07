@@ -31,6 +31,14 @@ Unlike other volume extensions that use `tabCapture` (which breaks fullscreen on
 3. Enable Developer mode
 4. Click "Load unpacked" and select this folder
 
+## Building
+
+```
+python build.py
+```
+
+Produces `amplify-chrome-vX.zip` and `amplify-firefox-vX.zip` from `manifest.json` and verifies both. The two stores need different manifests (Firefox: `background.scripts`, `browser_specific_settings.gecko`, 96px icon; Chrome: neither) — `build.py` is the single source of that difference.
+
 ## How It Works
 
 Amplify creates a Web Audio API chain per media element:
