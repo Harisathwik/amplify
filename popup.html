@@ -322,6 +322,21 @@
       transition: all 0.15s;
     }
     .kofi-link:hover { border-color: #ff5e5b; color: #ff5e5b; }
+
+    .power {
+      width: 100%; padding: 14px; margin-bottom: 6px;
+      border: 2px solid var(--border2); border-radius: 8px;
+      background: var(--bg2); color: var(--fg2);
+      font-size: 15px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: all 0.2s;
+    }
+    .power:hover { border-color: var(--fg); color: var(--fg); }
+    .power.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .power-icon { font-size: 20px; line-height: 1; font-family: "Segoe UI Symbol", system-ui, sans-serif; }
+    .power-hint { font-size: 10px; color: var(--fg3); text-align: center; margin-bottom: 10px; }
+    body:not(.off) .power-hint { display: none; }
+    body.off #controls, body.off .header-right { opacity: 0.35; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -336,6 +351,13 @@
     </div>
   </div>
 
+  <button class="power" id="powerBtn">
+    <span class="power-icon">&#x23FB;</span>
+    <span class="power-label">TURN ON</span>
+  </button>
+  <div class="power-hint">Boosts audio on this site. If sound stops, reload the page.</div>
+
+  <div id="controls">
   <div class="slider-container" id="sliderArea">
     <input type="range" id="slider" min="0" max="600" value="100" step="5">
     <div class="ticks">
@@ -378,6 +400,7 @@
   <div class="tab-list" id="tabList"></div>
 
   <button class="reset" id="reset">Reset to 100%</button>
+  </div>
 
   <div class="warn" id="warn"></div>
 

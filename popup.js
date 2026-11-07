@@ -48,14 +48,14 @@ function updateUI(val, muted = false) {
     display.textContent = "MUTED";
     display.className = "value muted";
     muteBtn.classList.add("muted");
-    muteBtn.innerHTML = "&#x1f507;";
+    muteBtn.textContent = "\u{1f507}";
     slider.classList.add("disabled");
   } else {
     display.textContent = val + "%";
     const level = val < 100 ? "level-low" : val <= 200 ? "level-normal" : val <= 400 ? "level-high" : "level-danger";
     display.className = `value ${level}`;
     muteBtn.classList.remove("muted");
-    muteBtn.innerHTML = val === 0 ? "&#x1f507;" : "&#x1f50a;";
+    muteBtn.textContent = val === 0 ? "\u{1f507}" : "\u{1f50a}";
     slider.classList.remove("disabled");
     slider.value = val;
     updateSliderFill(val);
@@ -96,38 +96,31 @@ function updateSiteUI(saved, hostname) {
   }
 }
 
-function allowSite(thenDo) {
-  siteAllowed = true;
-  chrome.storage.local.get({ allowedSites: [] }, (data) => {
-    if (!data.allowedSites.includes(currentHostname)) {
-      data.allowedSites.push(currentHostname);
-      chrome.storage.local.set({ allowedSites: data.allowedSites });
-    }
-    warn.style.display = "none";
-    if (thenDo) thenDo();
-  });
+const powerBtn = document.getElementById("powerBtn");
+const powerLabel = powerBtn.querySelector(".power-label");
+
+function setPowerUI(on) {
+  siteAllowed = on;
+  document.body.classList.toggle("off", !on);
+  powerBtn.classList.toggle("on", on);
+  powerLabel.textContent = on ? "ON" : "TURN ON";
 }
 
-let pendingAction = null;
-
-function showConsent() {
-  warn.style.display = "block";
-  warn.className = "warn level-high";
-  warn.innerHTML = 'Amplify will modify audio on this site. Some streaming sites may lose audio — reload the page to fix. <a href="#" id="consentYes" style="color:#4488cc;cursor:pointer">Enable</a>';
-  setTimeout(() => {
-    const btn = document.getElementById("consentYes");
-    if (btn) btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      allowSite(pendingAction);
-      pendingAction = null;
+function setPower(on) {
+  setPowerUI(on);
+  if (currentHostname) {
+    chrome.storage.local.get({ allowedSites: [] }, (data) => {
+      const list = data.allowedSites.filter(h => h !== currentHostname);
+      if (on) list.push(currentHostname);
+      chrome.storage.local.set({ allowedSites: list });
     });
-  }, 0);
-}
-
-function gatedAction(fn) {
-  if (siteAllowed) { fn(); return; }
-  pendingAction = fn;
-  showConsent();
+  }
+  if (!on) {
+    applyEQ("default");
+    updateNormalizeUI(false);
+    chrome.runtime.sendMessage({ action: "setNormalize", tabId: currentTabId, enabled: false });
+    applyVolume(100);
+  }
 }
 
 function buildCurrentProfile() {
@@ -141,7 +134,7 @@ function autoSaveSiteProfile() {
   });
 }
 
-function doApplyVolume(val) {
+function applyVolume(val) {
   updateUI(val, false);
   display.classList.add("flash");
   setTimeout(() => display.classList.remove("flash"), 120);
@@ -151,28 +144,16 @@ function doApplyVolume(val) {
   setTimeout(loadAudioTabs, 100);
 }
 
-function applyVolume(val) {
-  if (val === 100) { doApplyVolume(val); return; }
-  gatedAction(() => doApplyVolume(val));
-}
-
 function toggleMute() {
   if (!currentTabId) return;
   if (!isMuted) volumeBeforeMute = parseInt(slider.value);
-  gatedAction(() => {
-    chrome.runtime.sendMessage({ action: "toggleMute", tabId: currentTabId }, (resp) => {
-      updateUI(volumeBeforeMute, resp && resp.muted);
-      setTimeout(loadAudioTabs, 100);
-    });
+  chrome.runtime.sendMessage({ action: "toggleMute", tabId: currentTabId }, (resp) => {
+    updateUI(volumeBeforeMute, resp && resp.muted);
+    setTimeout(loadAudioTabs, 100);
   });
 }
 
 function applyEQ(preset) {
-  if (preset === "default") { doApplyEQ(preset); return; }
-  gatedAction(() => doApplyEQ(preset));
-}
-
-function doApplyEQ(preset) {
   updateEQUI(preset);
   if (!currentTabId) return;
   chrome.runtime.sendMessage({ action: "setEQ", tabId: currentTabId, preset });
@@ -180,13 +161,11 @@ function doApplyEQ(preset) {
 }
 
 function toggleNormalize() {
-  gatedAction(() => {
-    const enabled = !isNormalized;
-    updateNormalizeUI(enabled);
-    if (!currentTabId) return;
-    chrome.runtime.sendMessage({ action: "setNormalize", tabId: currentTabId, enabled });
-    autoSaveSiteProfile();
-  });
+  const enabled = !isNormalized;
+  updateNormalizeUI(enabled);
+  if (!currentTabId) return;
+  chrome.runtime.sendMessage({ action: "setNormalize", tabId: currentTabId, enabled });
+  autoSaveSiteProfile();
 }
 
 function saveSiteProfile() {
@@ -295,32 +274,37 @@ function loadAudioTabs() {
     const tabs = resp.tabs;
     if (tabs.length === 0) {
       tabListLabel.style.display = "none";
-      tabList.innerHTML = "";
+      tabList.textContent = "";
       return;
     }
     tabListLabel.style.display = "block";
-    tabList.innerHTML = tabs.map(t => `
-      <div class="tab-item ${t.id === currentTabId ? 'current' : ''}" data-tabid="${t.id}">
-        ${t.favIconUrl ? `<img class="tab-icon" src="${t.favIconUrl}" alt="">` : '<span class="tab-icon"></span>'}
-        <span class="tab-title">${escapeHtml(t.title || 'Tab')}</span>
-        <span class="tab-vol">${t.muted ? 'M' : t.volume + '%'}</span>
-      </div>
-    `).join("");
-
-    tabList.querySelectorAll(".tab-item").forEach(el => {
-      el.addEventListener("click", () => {
-        const tid = parseInt(el.dataset.tabid);
-        chrome.tabs.update(tid, { active: true });
-      });
+    tabList.textContent = "";
+    tabs.forEach(t => {
+      const row = document.createElement("div");
+      row.className = "tab-item" + (t.id === currentTabId ? " current" : "");
+      if (t.favIconUrl) {
+        const icon = document.createElement("img");
+        icon.className = "tab-icon";
+        icon.src = t.favIconUrl;
+        icon.alt = "";
+        row.appendChild(icon);
+      } else {
+        row.appendChild(document.createElement("span")).className = "tab-icon";
+      }
+      const title = document.createElement("span");
+      title.className = "tab-title";
+      title.textContent = t.title || "Tab";
+      row.appendChild(title);
+      const vol = document.createElement("span");
+      vol.className = "tab-vol";
+      vol.textContent = t.muted ? "M" : t.volume + "%";
+      row.appendChild(vol);
+      row.addEventListener("click", () => chrome.tabs.update(t.id, { active: true }));
+      tabList.appendChild(row);
     });
   });
 }
 
-function escapeHtml(s) {
-  const d = document.createElement("div");
-  d.textContent = s;
-  return d.innerHTML;
-}
 
 slider.addEventListener("input", () => applyVolume(parseInt(slider.value)));
 presets.forEach(btn => btn.addEventListener("click", () => applyVolume(parseInt(btn.dataset.val))));
@@ -330,6 +314,7 @@ saveSiteBtn.addEventListener("click", saveSiteProfile);
 clearSiteBtn.addEventListener("click", clearSiteProfile);
 themeBtn.addEventListener("click", toggleTheme);
 muteBtn.addEventListener("click", toggleMute);
+powerBtn.addEventListener("click", () => setPower(!siteAllowed));
 
 resetBtn.addEventListener("click", () => {
   applyEQ("default");
@@ -340,6 +325,7 @@ resetBtn.addEventListener("click", () => {
 
 sliderArea.addEventListener("wheel", (e) => {
   e.preventDefault();
+  if (!siteAllowed) return;
   const current = parseInt(slider.value);
   const delta = e.deltaY < 0 ? 10 : -10;
   if (isMuted) toggleMute();
@@ -347,6 +333,7 @@ sliderArea.addEventListener("wheel", (e) => {
 }, { passive: false });
 
 document.addEventListener("keydown", (e) => {
+  if (!siteAllowed) return;
   if (e.key === "m" || e.key === "M") { e.preventDefault(); toggleMute(); return; }
   const current = parseInt(slider.value);
   if (e.key === "ArrowRight" || e.key === "ArrowUp") {
@@ -371,7 +358,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 
   if (currentHostname) {
     chrome.storage.local.get({ allowedSites: [] }, (data) => {
-      siteAllowed = data.allowedSites.includes(currentHostname);
+      setPowerUI(data.allowedSites.includes(currentHostname));
     });
   }
 
