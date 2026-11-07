@@ -9,9 +9,7 @@
 - No user accounts
 
 The extension requires these permissions:
-- **activeTab**: To modify audio on the current tab
 - **storage**: To save your volume/EQ preferences locally
-- **scripting**: To inject the audio processing script
 - **contextMenus**: To add right-click volume controls
 - **tabs**: To show which tabs are playing audio
 

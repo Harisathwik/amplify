@@ -29,6 +29,11 @@ build(f"amplify-firefox-v{v}.zip", firefox, ["icons/icon-96.png"])
 
 # ---- verify ----
 fails = []
+# CWS rejects declared-but-unused permissions (v2.2.0 rejection: "scripting").
+_code = "".join(open(f, encoding="utf-8").read() for f in ("background.js", "content.js", "popup.js"))
+for perm in base["permissions"]:
+    if f"chrome.{perm}" not in _code:
+        fails.append(f"permission '{perm}' declared but chrome.{perm} never used")
 def check(ok, msg):
     if not ok: fails.append(msg)
 

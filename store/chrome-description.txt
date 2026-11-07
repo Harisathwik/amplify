@@ -1,0 +1,30 @@
+Amplify — Volume boost up to 600% that works in fullscreen.
+
+Unlike other volume boosters that break fullscreen mode on YouTube and video sites, Amplify uses a different audio approach that keeps fullscreen working perfectly.
+
+FEATURES:
+• Volume boost from 0% to 600%
+• Fullscreen-safe — no conflicts with YouTube, Twitch, Vimeo
+• EQ presets: Voice (dialogue clarity), Bass (low-end boost), Night (reduced bass + voice clarity for late-night watching)
+• Auto-normalize — evens out volume jumps between videos
+• Per-site profiles — save your preferred volume per website
+• Audio visualizer with song title display
+• Tab audio list — see and switch between tabs playing audio
+• Keyboard shortcuts: Alt+Shift+Up/Down (volume), Alt+Shift+M (mute)
+• Right-click context menu for quick volume changes
+• Dark/light theme
+• Zero data collection — all settings stored locally
+
+HOW IT WORKS:
+Amplify processes audio through the Web Audio API directly on media elements, without capturing the entire tab. This means fullscreen, picture-in-picture, and other browser features continue working normally.
+
+LIMITATIONS:
+Some DRM-protected streaming services (Qobuz, Tidal, Amazon Music) may not support audio boosting. A per-site consent prompt appears before modifying audio for the first time. If audio stops on any site, simply reload the page.
+
+PERMISSIONS EXPLAINED:
+• storage: Save your settings locally
+• tabs: Show which tabs are playing audio
+• contextMenus: Right-click volume controls
+
+Open source: https://github.com/Harisathwik/amplify
+Support: https://ko-fi.com/rednodestudio

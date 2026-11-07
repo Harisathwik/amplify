@@ -2,8 +2,12 @@
   "manifest_version": 3,
   "name": "Amplify",
   "description": "Volume boost up to 600% that works in fullscreen. EQ, night mode, per-site profiles.",
-  "version": "2.2.0",
-  "permissions": ["activeTab", "storage", "scripting", "contextMenus", "tabs"],
+  "version": "2.2.1",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "tabs"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -24,23 +28,33 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle",
       "all_frames": true
     }
   ],
   "commands": {
     "volume-up": {
-      "suggested_key": { "default": "Alt+Shift+Up" },
+      "suggested_key": {
+        "default": "Alt+Shift+Up"
+      },
       "description": "Volume up (+25%)"
     },
     "volume-down": {
-      "suggested_key": { "default": "Alt+Shift+Down" },
+      "suggested_key": {
+        "default": "Alt+Shift+Down"
+      },
       "description": "Volume down (-25%)"
     },
     "toggle-mute": {
-      "suggested_key": { "default": "Alt+Shift+M" },
+      "suggested_key": {
+        "default": "Alt+Shift+M"
+      },
       "description": "Mute / unmute tab"
     }
   }
