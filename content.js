@@ -149,10 +149,15 @@
       setNormalize(msg.enabled);
       sendResponse({ ok: true });
     }
+    // With all_frames, only the frame that owns media answers read queries,
+    // otherwise the empty top frame wins the race and the popup shows "No audio".
+    const hasMedia = document.querySelector("video, audio") !== null;
     if (msg.action === "getAnalyserData") {
+      if (!hasMedia) return false;
       sendResponse(getAnalyserData());
     }
     if (msg.action === "getMediaInfo") {
+      if (!hasMedia) return false;
       const meta = navigator.mediaSession && navigator.mediaSession.metadata;
       const media = document.querySelector("video, audio");
       sendResponse({
